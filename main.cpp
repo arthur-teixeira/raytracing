@@ -6,19 +6,25 @@
 
 #define ASPECT_RATIO (16.0f / 9.0f)
 
-bool hit_sphere(const point3 &center, double radius, const ray &r) {
+double hit_sphere(const point3 &center, double radius, const ray &r) {
   vec3 oc = r.origin() - center;
   double a = dot(r.direction(), r.direction());
   double b = 2.0 * dot(oc, r.direction());
   double c = dot(oc, oc) - radius * radius;
   double discriminant = b * b - 4 * a * c;
 
-  return (discriminant >= 0);
+  if (discriminant < 0) {
+    return -1.0;
+  }
+
+  return (-b - sqrt(discriminant)) / (2.0 * a);
 }
 
 color ray_color(const ray &r) {
-  if (hit_sphere(point3(0, 0, -1), 0.5, r)) {
-    return color(1, 0, 0);
+  double t = hit_sphere(point3(0, 0, -1), 0.5, r);
+  if (t > 0) {
+    vec3 N = unit_vec(r.at(t) - vec3(0, 0, -1));
+    return 0.5 * (N + 1);
   }
 
   vec3 unit_direction = unit_vec(r.direction());
