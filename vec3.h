@@ -45,6 +45,7 @@ public:
 };
 
 using point3 = vec3;
+using color = vec3;
 
 inline std::ostream &operator<<(std::ostream &out, const vec3 &v) {
   return out << v.x() << ' ' << v.y() << ' ' << v.z();
