@@ -13,6 +13,8 @@
 int main() {
   hittable_list world;
 
+  auto R = cos(pi / 4);
+
   auto mat_ground = make_shared<lambertian>(color(0.8, 0.8, 0.0));
   auto mat_center = make_shared<lambertian>(color(0.1, 0.2, 0.5));
   auto mat_left = make_shared<dieletric>(1.5);
@@ -32,6 +34,10 @@ int main() {
   cam.image_width = 1920;
 #endif // PREVIEW
 
+  cam.vfov = 90;
+  cam.lookfrom = point3(-2, 2, 1);
+  cam.lookat = point3(0, 0, -1);
+  cam.vup = vec3(0, 1, 0);
   cam.samples_per_pixel = 100;
   cam.render(world);
 }
