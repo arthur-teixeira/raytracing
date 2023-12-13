@@ -5,6 +5,7 @@
 #include "ray.h"
 #include "utils.h"
 #include "vec3.h"
+#include <math.h>
 
 class hit_record;
 
@@ -65,15 +66,33 @@ public:
     double refraction_ratio = rec.front_face ? (1.0 / ir) : ir;
 
     vec3 unit_direction = unit_vec(in.direction());
-    vec3 refracted = refract(unit_direction, rec.normal, refraction_ratio);
+    double cos_theta = fmin(dot(-unit_direction, rec.normal), 1.0);
+    double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
-    scattered = ray(rec.p, refracted);
+    bool should_reflect = refraction_ratio * sin_theta > 1.0;
+
+    vec3 direction;
+    if (should_reflect || reflectance(cos_theta, refraction_ratio) > random_double()) {
+      direction = reflect(unit_direction, rec.normal);
+    } else {
+      direction = refract(unit_direction, rec.normal, refraction_ratio);
+    }
+
+    scattered = ray(rec.p, direction);
 
     return true;
   }
 
 private:
   double ir;
+
+  static double reflectance(double cosine, double ref_idx) {
+    // Schlicks approximation
+    double r0 = (1 - ref_idx) / (1 + ref_idx);
+    r0 *= r0;
+
+    return r0 + (1 - r0) * pow((1 - cosine), 5);
+  }
 };
 
 #endif // MATERIAL_H
