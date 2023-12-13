@@ -55,4 +55,25 @@ private:
   double fuzz;
 };
 
+class dieletric : public material {
+public:
+  dieletric(double refraction_index) : ir(refraction_index) {}
+
+  bool scatter(const ray &in, const hit_record &rec, color &attenuation,
+               ray &scattered) const override {
+    attenuation = color(1, 1, 1);
+    double refraction_ratio = rec.front_face ? (1.0 / ir) : ir;
+
+    vec3 unit_direction = unit_vec(in.direction());
+    vec3 refracted = refract(unit_direction, rec.normal, refraction_ratio);
+
+    scattered = ray(rec.p, refracted);
+
+    return true;
+  }
+
+private:
+  double ir;
+};
+
 #endif // MATERIAL_H
